@@ -12,24 +12,20 @@ const updateTaskSchema = z.object({
     status: z.enum(['todo', 'in-progress', 'done']).optional(),
 });
 
-// 1. Define an explicit type for our route's context
-type RouteContext = {
-    params: {
-        id: string;
-    };
-};
-
-// 2. Apply the explicit type to the PUT handler's context
-export async function PUT(request: NextRequest, context: RouteContext) {
+export async function PUT(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        const taskId = context.params.id;
+        const { id: taskId } = await params;
         const body = await request.json();
 
         const validation = updateTaskSchema.safeParse(body);
         if (!validation.success) {
-            return NextResponse.json(validation.error.flatten().fieldErrors, {
-                status: 400,
-            });
+            return NextResponse.json(
+                { errors: validation.error.issues },
+                { status: 400 }
+            );
         }
 
         const { title, description, status } = validation.data;
@@ -55,10 +51,12 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     }
 }
 
-// 3. Apply the explicit type to the DELETE handler's context as well
-export async function DELETE(request: NextRequest, context: RouteContext) {
+export async function DELETE(
+    _request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        const taskId = context.params.id;
+        const { id: taskId } = await params;
         await prisma.task.delete({
             where: { id: taskId },
         });

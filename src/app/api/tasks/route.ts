@@ -30,9 +30,10 @@ export async function POST(request: Request) {
         const validation = createTaskSchema.safeParse(body);
 
         if (!validation.success) {
-            return NextResponse.json(validation.error.flatten().fieldErrors, {
-                status: 400,
-            });
+            return NextResponse.json(
+                { errors: validation.error.issues },
+                { status: 400 }
+            );
         }
 
         const { title, description, status } = validation.data;
