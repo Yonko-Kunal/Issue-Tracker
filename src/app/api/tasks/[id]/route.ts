@@ -12,13 +12,17 @@ const updateTaskSchema = z.object({
     status: z.enum(['todo', 'in-progress', 'done']).optional(),
 });
 
-// 1. Change the signature to use a 'context' parameter
-export async function PUT(
-    request: NextRequest,
-    context: { params: { id: string } }
-) {
+// 1. Define an explicit type for our route's context
+type RouteContext = {
+    params: {
+        id: string;
+    };
+};
+
+// 2. Apply the explicit type to the PUT handler's context
+export async function PUT(request: NextRequest, context: RouteContext) {
     try {
-        const taskId = context.params.id; // 2. Access the id from context.params
+        const taskId = context.params.id;
         const body = await request.json();
 
         const validation = updateTaskSchema.safeParse(body);
@@ -51,13 +55,10 @@ export async function PUT(
     }
 }
 
-// 3. Apply the same signature change to DELETE
-export async function DELETE(
-    request: NextRequest,
-    context: { params: { id: string } }
-) {
+// 3. Apply the explicit type to the DELETE handler's context as well
+export async function DELETE(request: NextRequest, context: RouteContext) {
     try {
-        const taskId = context.params.id; // 4. Access the id from context.params
+        const taskId = context.params.id;
         await prisma.task.delete({
             where: { id: taskId },
         });
