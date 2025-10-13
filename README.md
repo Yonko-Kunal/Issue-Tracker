@@ -1,119 +1,102 @@
-# Issue Tracker Application
+# Issue Tracker
 
-A modern task management and issue tracking application built with Next.js, TypeScript, and shadcn/ui components.
+A modern, full-stack issue and task management application built with Next.js, TypeScript, and a powerful backend featuring Prisma and PostgreSQL. This project showcases a complete CRUD implementation with a seamless, responsive user experience.
 
-## Features
+![Issue Tracker Screenshot](<img width="1919" height="556" alt="image" src="https://github.com/user-attachments/assets/ada12de0-e22c-4eb3-b375-da5fdcc85cd0" />
+) 
+*Replace the URL above with a screenshot of your application.*
 
-### ✅ Task Management
-- **Create Tasks**: Add new tasks with title, description, and status
-- **View Tasks**: Organized in three columns (Todo, In Progress, Done)
-- **Edit Tasks**: Full editing capabilities for all task properties
-- **Delete Tasks**: Remove tasks with confirmation dialog
+### ✨ [Live Demo](https://issue-tracker-tawny-two.vercel.app/)
 
-### 🎯 Task Details
-- **Detailed View**: Click any task to see full details
-- **Status Updates**: Update task status via dropdown or drag & drop
-- **Task Metadata**: View creation and last updated timestamps
-- **Navigation**: Seamless navigation between views
+---
 
-### 🖱️ Drag & Drop Functionality
-- **Intuitive Interface**: Drag tasks between columns to update status
-- **Smart Drop Zones**: Drop zones only appear when actively dragging
-- **Visual Feedback**: 
-  - Hover effects show drag handles
-  - Drop zones highlight when dragging over them
-  - Smooth animations and transitions
-- **Touch Support**: Works on mobile devices
-- **Real-time Updates**: Changes persist immediately to localStorage
+## Key Features
 
-### 🎨 Design Features
-- **Clean UI**: Modern design using shadcn/ui components
-- **Geist Mono Font**: Professional monospace typography
-- **Responsive**: Works on desktop and mobile devices
-- **Accessibility**: Proper ARIA labels and keyboard navigation
+- **Full-Stack CRUD Functionality**: Create, Read, Update, and Delete tasks with data persisted in a PostgreSQL database.
+- **Intuitive Drag & Drop**: Effortlessly change a task's status by dragging it between columns on the board.
+- **Optimistic UI Updates**: Experience an incredibly fast and responsive interface where UI changes happen instantly, without waiting for the server response.
+- **Detailed Task Views**: Click any task to view, edit its details, or delete it from the system.
+- **API-Driven Architecture**: All frontend actions are powered by a robust set of RESTful API endpoints built with Next.js API Routes.
+- **Modern & Responsive UI**: Clean, accessible, and fully responsive design built with **shadcn/ui** and **Tailwind CSS**.
 
-## How to Use
+---
 
-### Creating Tasks
-1. Click "Create New Task" in the navbar
-2. Fill in the task details (title, description, status)
-3. Click "Create Task" to save
+## Tech Stack
 
-### Managing Tasks
-1. **View**: Tasks are displayed in three columns by status
-2. **Update Status**: 
-   - Drag and drop tasks between columns, OR
-   - Click "Update Status" button on task cards, OR
-   - Use the dropdown in task details view
-3. **Edit**: Click on any task to view details, then click "Edit Task"
-4. **Delete**: In task details view, click "Remove Task"
+| Category      | Technology                                                                          |
+|---------------|-------------------------------------------------------------------------------------|
+| **Frontend** | [**Next.js 15**](https://nextjs.org/) (App Router), [**React**](https://react.dev/), [**TypeScript**](https://www.typescriptlang.org/) |
+| **Backend** | [**Next.js API Routes**](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) |
+| **Database** | [**PostgreSQL**](https://www.postgresql.org/) (via [**Supabase**](https://supabase.com/)) |
+| **ORM** | [**Prisma**](https://www.prisma.io/) - Next-generation Node.js and TypeScript ORM     |
+| **Styling** | [**Tailwind CSS**](https://tailwindcss.com/), [**shadcn/ui**](https://ui.shadcn.com/) |
+| **Data Fetching**| [**SWR**](https://swr.vercel.app/) - React Hooks for Data Fetching                 |
+| **Drag & Drop**| [**@dnd-kit**](https://dndkit.com/)                                                  |
+| **Validation**| [**Zod**](https://zod.dev/) - TypeScript-first schema validation                     |
 
-### Drag & Drop
-1. **Hover** over a task card to see the drag handle (⋮⋮)
-2. **Click and drag** the handle or the entire task card
-3. **Drop zones appear** automatically when dragging starts
-4. **Drop** the task in any column to update its status
-5. **Visual feedback** shows where you can drop the task
-
-## Technical Stack
-
-- **Framework**: Next.js 15 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Components**: shadcn/ui
-- **Drag & Drop**: @dnd-kit/core
-- **Storage**: localStorage (client-side persistence)
-- **Icons**: Lucide React
+---
 
 ## Getting Started
 
-```bash
-# Install dependencies
-npm install
+Follow these instructions to get the project running locally on your machine.
 
-# Run development server
-npm run dev
+### Prerequisites
 
-# Build for production
-npm run build
-```
+- Node.js (v18 or later)
+- npm or yarn
+- A PostgreSQL database (you can get a free one from [Supabase](https://supabase.com/))
 
-## Project Structure
+### Installation & Setup
 
-```
-src/
-├── app/                    # Next.js app router pages
-│   ├── create-task/       # Task creation page
-│   ├── task/[id]/         # Task details and edit pages
-│   └── page.tsx           # Main tasks dashboard
-├── components/            # Reusable components
-│   ├── ui/               # shadcn/ui components
-│   ├── draggable-task-card.tsx
-│   ├── droppable-task-column.tsx
-│   ├── navbar.tsx
-│   └── task-*.tsx        # Task-related components
-├── hooks/                # Custom React hooks
-│   └── use-tasks.ts      # Task management logic
-└── types/                # TypeScript type definitions
-    └── task.ts           # Task and status types
-```
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/Yonko-Kunal/Issue-Tracker.git](https://github.com/Yonko-Kunal/Issue-Tracker.git)
+    cd Issue-Tracker
+    ```
 
-## Features in Detail
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-### Drag & Drop Implementation
-- Uses @dnd-kit for smooth, accessible drag and drop
-- Supports both mouse and touch interactions
-- Visual feedback with hover states and drop zones
-- Automatic status updates when dropping in different columns
+3.  **Set up environment variables:**
+    - Create a `.env` file in the root of the project by copying the example file:
+        ```bash
+        cp .env.example .env
+        ```
+    - Open the `.env` file and add your PostgreSQL connection strings for `DATABASE_URL` and `DIRECT_URL`. You can get these from your database provider (e.g., Supabase).
 
-### Data Persistence
-- All tasks stored in localStorage
-- Automatic sync across all pages
-- Handles browser refresh and navigation
-- Initial demo data provided for new users
+4.  **Sync the database schema:**
+    - Push the Prisma schema to your database. This will create the `Task` table.
+        ```bash
+        npx prisma db push
+        ```
 
-### Responsive Design
-- Mobile-first approach
-- Touch-friendly drag and drop
-- Responsive grid layout
-- Optimized for all screen sizes
+5.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+---
+
+## API Endpoints
+
+The application exposes the following RESTful API endpoints:
+
+| Method   | Endpoint                | Description                     |
+|----------|-------------------------|---------------------------------|
+| `GET`    | `/api/tasks`            | Fetches all tasks               |
+| `POST`   | `/api/tasks`            | Creates a new task              |
+| `PUT`    | `/api/tasks/[id]`       | Updates an existing task        |
+| `DELETE` | `/api/tasks/[id]`       | Deletes a task by its ID        |
+
+---
+
+## Upcoming Features
+
+This project is a solid foundation. Future enhancements could include:
+- **User Authentication**: Implement user sign-up and login using NextAuth.js or Clerk.
+- **Row-Level Security (RLS)**: Secure the database to ensure users can only access their own tasks.
+- **Task Filtering & Sorting**: Add controls to filter tasks by title or sort them by creation date.
