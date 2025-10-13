@@ -6,12 +6,20 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { ArrowLeft } from 'lucide-react';
 import { TaskStatus } from '@/types/task';
+import { useTasks } from '@/hooks/use-tasks'; // 1. Import the hook
 
 export default function CreateTaskPage() {
     const router = useRouter();
+    const { addTask } = useTasks(); // 2. Get the addTask function from our hook
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState<TaskStatus>('todo');
@@ -21,30 +29,19 @@ export default function CreateTaskPage() {
         e.preventDefault();
 
         if (!title.trim()) {
+            // You can replace alert with a more modern UI element later
             alert('Please enter a task title');
             return;
         }
 
         setIsSubmitting(true);
 
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // For now, we'll store the task in localStorage
-        // In a real app, this would be an API call
-        const newTask = {
-            id: Date.now().toString(),
+        // 3. Replace all the localStorage logic with this single line
+        await addTask({
             title: title.trim(),
             description: description.trim() || undefined,
             status,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        };
-
-        // Get existing tasks from localStorage
-        const existingTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        const updatedTasks = [...existingTasks, newTask];
-        localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+        });
 
         setIsSubmitting(false);
         router.push('/');
@@ -69,7 +66,9 @@ export default function CreateTaskPage() {
             {/* Main Content */}
             <div className="max-w-2xl mx-auto p-6">
                 <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Create New Task</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                        Create New Task
+                    </h2>
                     <p className="text-gray-600">
                         Fill out the details below to add a new task to the issue tracker.
                     </p>
@@ -78,7 +77,10 @@ export default function CreateTaskPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Title Field */}
                     <div>
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-900 mb-2">
+                        <label
+                            htmlFor="title"
+                            className="block text-sm font-medium text-gray-900 mb-2"
+                        >
                             Title
                         </label>
                         <Input
@@ -94,7 +96,10 @@ export default function CreateTaskPage() {
 
                     {/* Description Field */}
                     <div>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-900 mb-2">
+                        <label
+                            htmlFor="description"
+                            className="block text-sm font-medium text-gray-900 mb-2"
+                        >
                             Description
                         </label>
                         <Textarea
@@ -109,10 +114,16 @@ export default function CreateTaskPage() {
 
                     {/* Status Field */}
                     <div>
-                        <label htmlFor="status" className="block text-sm font-medium text-gray-900 mb-2">
+                        <label
+                            htmlFor="status"
+                            className="block text-sm font-medium text-gray-900 mb-2"
+                        >
                             Status
                         </label>
-                        <Select value={status} onValueChange={(value: TaskStatus) => setStatus(value)}>
+                        <Select
+                            value={status}
+                            onValueChange={(value: TaskStatus) => setStatus(value)}
+                        >
                             <SelectTrigger className="w-full">
                                 <SelectValue />
                             </SelectTrigger>

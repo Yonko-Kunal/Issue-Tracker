@@ -5,8 +5,8 @@ export interface Task {
     title: string;
     description?: string;
     status: TaskStatus;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface TaskColumn {

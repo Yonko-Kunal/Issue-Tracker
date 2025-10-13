@@ -9,8 +9,7 @@ import { useTasks } from '@/hooks/use-tasks';
 import { Task, TaskStatus } from '@/types/task';
 
 export default function Home() {
-  const { updateTaskStatus, getTaskColumns, getTaskById } = useTasks();
-  const columns = getTaskColumns();
+  const { updateTaskStatus, columns, getTaskById } = useTasks();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -20,21 +19,7 @@ export default function Home() {
   };
 
   const handleDragOver = (event: DragOverEvent) => {
-    const { active, over } = event;
 
-    if (!over) return;
-
-    const activeId = active.id as string;
-    const overId = over.id as string;
-
-    // Check if we're dropping over a column
-    const overColumn = columns.find(col => col.id === overId);
-    if (overColumn) {
-      const task = getTaskById(activeId);
-      if (task && task.status !== overColumn.id) {
-        updateTaskStatus(activeId, overColumn.id as TaskStatus);
-      }
-    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {

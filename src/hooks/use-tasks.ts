@@ -1,145 +1,82 @@
-'use client';
+// src/hooks/use-tasks.ts
 
-import { useState, useCallback, useEffect } from 'react';
-import { Task, TaskStatus, TaskColumn } from '@/types/task';
+import { Task, TaskColumn, TaskStatus } from '@/types/task';
+import useSWR from 'swr';
+import { useMemo, useCallback } from 'react'; // 1. Add useCallback to imports
 
-const initialTasks: Task[] = [
-    {
-        id: '1',
-        title: 'Finalize landing page design',
-        description: 'Complete the design mockups for the new landing page',
-        status: 'todo',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: '2',
-        title: 'Fix authentication bug',
-        description: 'Resolve the login issue affecting mobile users',
-        status: 'todo',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: '3',
-        title: 'Develop new dashboard components',
-        description: 'Create reusable components for the admin dashboard',
-        status: 'in-progress',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: '4',
-        title: 'Deploy latest changes to production',
-        description: 'Push the latest features to the production environment',
-        status: 'done',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: '5',
-        title: 'Write documentation for API',
-        description: 'Document all API endpoints and usage examples',
-        status: 'done',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-];
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function useTasks() {
-    const [tasks, setTasks] = useState<Task[]>([]);
+    const { data, error, isLoading, mutate } = useSWR<Task[]>('/api/tasks', fetcher);
+    const tasks = data || [];
 
-    // Load tasks from localStorage on mount
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const storedTasks = localStorage.getItem('tasks');
-            if (storedTasks) {
-                const parsedTasks = JSON.parse(storedTasks).map((task: any) => ({
-                    ...task,
-                    createdAt: new Date(task.createdAt),
-                    updatedAt: new Date(task.updatedAt),
-                }));
-                setTasks(parsedTasks);
-            } else {
-                // If no tasks in localStorage, use initial tasks
-                setTasks(initialTasks);
-                localStorage.setItem('tasks', JSON.stringify(initialTasks));
-            }
-        }
-    }, []);
-
-    const updateTaskStatus = useCallback((taskId: string, newStatus: TaskStatus) => {
-        setTasks(prevTasks => {
-            const updatedTasks = prevTasks.map(task =>
-                task.id === taskId
-                    ? { ...task, status: newStatus, updatedAt: new Date() }
-                    : task
-            );
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-            }
-            return updatedTasks;
-        });
-    }, []);
-
-    const getTaskColumns = useCallback((): TaskColumn[] => {
-        const todoTasks = tasks.filter(task => task.status === 'todo');
-        const inProgressTasks = tasks.filter(task => task.status === 'in-progress');
-        const doneTasks = tasks.filter(task => task.status === 'done');
-
+    const columns = useMemo((): TaskColumn[] => {
         return [
-            {
-                id: 'todo',
-                title: 'Todo',
-                color: '#3b82f6', // blue
-                tasks: todoTasks,
-            },
-            {
-                id: 'in-progress',
-                title: 'In Progress',
-                color: '#f59e0b', // amber
-                tasks: inProgressTasks,
-            },
-            {
-                id: 'done',
-                title: 'Done',
-                color: '#10b981', // emerald
-                tasks: doneTasks,
-            },
+            { id: 'todo', title: 'Todo', color: '#3b82f6', tasks: tasks.filter((t) => t.status === 'todo') },
+            { id: 'in-progress', title: 'In Progress', color: '#f59e0b', tasks: tasks.filter((t) => t.status === 'in-progress') },
+            { id: 'done', title: 'Done', color: '#10b981', tasks: tasks.filter((t) => t.status === 'done') },
         ];
     }, [tasks]);
 
-    const getTaskById = useCallback((taskId: string): Task | undefined => {
-        return tasks.find(task => task.id === taskId);
-    }, [tasks]);
+    // 2. Wrap getTaskById in useCallback
+    const getTaskById = useCallback((id: string): Task | undefined => {
+        return tasks.find((task) => task.id === id);
+    }, [tasks]); // This function will now only be recreated if the 'tasks' array changes
 
-    const removeTask = useCallback((taskId: string) => {
-        setTasks(prevTasks => {
-            const updatedTasks = prevTasks.filter(task => task.id !== taskId);
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-            }
-            return updatedTasks;
-        });
-    }, []);
+    const addTask = async (taskData: { title: string; description?: string; status: TaskStatus; }) => {
+        // ... addTask implementation is already correct
+        try {
+            const response = await fetch('/api/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(taskData) });
+            if (!response.ok) throw new Error('Failed to create task');
+            mutate();
+        } catch (err) { console.error(err); }
+    };
 
-    const updateTask = useCallback((updatedTask: Task) => {
-        setTasks(prevTasks => {
-            const updatedTasks = prevTasks.map(task =>
-                task.id === updatedTask.id ? updatedTask : task
-            );
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-            }
-            return updatedTasks;
-        });
-    }, []);
+    const updateTaskStatus = async (taskId: string, status: TaskStatus) => {
+        // ... updateTaskStatus implementation is already correct
+        mutate(
+            (currentTasks: Task[] | undefined) => currentTasks?.map((task) => task.id === taskId ? { ...task, status } : task) || [],
+            { revalidate: false }
+        );
+        try {
+            const response = await fetch(`/api/tasks/${taskId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
+            if (!response.ok) throw new Error('Failed to update task status on the server');
+        } catch (err) { console.error(err); mutate(); }
+    };
+
+    const updateTask = async (updatedTaskData: Partial<Task> & { id: string }) => {
+        // ... updateTask implementation is already correct
+        mutate(
+            (currentTasks: Task[] | undefined) => currentTasks?.map((task) => task.id === updatedTaskData.id ? { ...task, ...updatedTaskData } : task) || [],
+            { revalidate: false }
+        );
+        try {
+            const { id, ...dataToUpdate } = updatedTaskData;
+            const response = await fetch(`/api/tasks/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataToUpdate) });
+            if (!response.ok) throw new Error('Failed to update task on the server');
+        } catch (err) { console.error(err); mutate(); }
+    };
+
+    const removeTask = async (taskId: string) => {
+        // ... removeTask implementation is already correct
+        mutate(
+            (currentTasks: Task[] | undefined) => currentTasks?.filter((task) => task.id !== taskId) || [],
+            { revalidate: false }
+        );
+        try {
+            const response = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Failed to delete task on the server');
+        } catch (err) { console.error(err); mutate(); }
+    };
 
     return {
         tasks,
-        updateTaskStatus,
-        getTaskColumns,
+        isLoading,
+        isError: error,
+        columns,
         getTaskById,
+        addTask,
+        updateTaskStatus,
         removeTask,
         updateTask,
     };
