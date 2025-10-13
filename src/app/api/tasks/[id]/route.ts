@@ -1,5 +1,6 @@
+// src/app/api/tasks/[id]/route.ts
+
 import { PrismaClient } from '@/generated/prisma';
-// 1. Import NextRequest along with NextResponse
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -11,13 +12,13 @@ const updateTaskSchema = z.object({
     status: z.enum(['todo', 'in-progress', 'done']).optional(),
 });
 
-// 2. Update the function signature for PUT
+// 1. Change the signature to use a 'context' parameter
 export async function PUT(
-    request: NextRequest, // Use NextRequest instead of Request
-    { params }: { params: { id: string } }
+    request: NextRequest,
+    context: { params: { id: string } }
 ) {
     try {
-        const taskId = params.id;
+        const taskId = context.params.id; // 2. Access the id from context.params
         const body = await request.json();
 
         const validation = updateTaskSchema.safeParse(body);
@@ -50,14 +51,13 @@ export async function PUT(
     }
 }
 
-// 3. Update the function signature for DELETE as well
+// 3. Apply the same signature change to DELETE
 export async function DELETE(
-    request: NextRequest, // Use NextRequest here too
-    { params }: { params: { id: string } }
+    request: NextRequest,
+    context: { params: { id: string } }
 ) {
     try {
-        const taskId = params.id;
-
+        const taskId = context.params.id; // 4. Access the id from context.params
         await prisma.task.delete({
             where: { id: taskId },
         });
