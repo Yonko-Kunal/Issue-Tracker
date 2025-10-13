@@ -1,18 +1,19 @@
 import { PrismaClient } from '@/generated/prisma';
-import { NextResponse } from 'next/server';
+// 1. Import NextRequest along with NextResponse
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const prisma = new PrismaClient();
 
-// New schema: all fields are optional for partial updates
 const updateTaskSchema = z.object({
     title: z.string().min(1, 'Title is required.').max(255).optional(),
     description: z.string().optional(),
     status: z.enum(['todo', 'in-progress', 'done']).optional(),
 });
 
+// 2. Update the function signature for PUT
 export async function PUT(
-    request: Request,
+    request: NextRequest, // Use NextRequest instead of Request
     { params }: { params: { id: string } }
 ) {
     try {
@@ -31,7 +32,6 @@ export async function PUT(
         const updatedTask = await prisma.task.update({
             where: { id: taskId },
             data: {
-                // Prisma will only update the fields that are provided
                 title,
                 description,
                 status,
@@ -50,8 +50,9 @@ export async function PUT(
     }
 }
 
+// 3. Update the function signature for DELETE as well
 export async function DELETE(
-    request: Request,
+    request: NextRequest, // Use NextRequest here too
     { params }: { params: { id: string } }
 ) {
     try {
@@ -61,7 +62,7 @@ export async function DELETE(
             where: { id: taskId },
         });
 
-        return new NextResponse(null, { status: 204 }); // 204 No Content is standard for successful deletions
+        return new NextResponse(null, { status: 204 });
     } catch (error) {
         if (error instanceof Error && error.message.includes('Record to delete does not exist')) {
             return NextResponse.json({ error: 'Task not found' }, { status: 404 });
