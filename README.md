@@ -2,10 +2,6 @@
 
 A modern, full-stack issue and task management application built with Next.js, TypeScript, and a powerful backend featuring Prisma and PostgreSQL. This project showcases a complete CRUD implementation with a seamless, responsive user experience.
 
-![Issue Tracker Screenshot](<img width="1919" height="556" alt="image" src="https://github.com/user-attachments/assets/ada12de0-e22c-4eb3-b375-da5fdcc85cd0" />
-) 
-*Replace the URL above with a screenshot of your application.*
-
 ### ✨ [Live Demo](https://issue-tracker-tawny-two.vercel.app/)
 
 ---
